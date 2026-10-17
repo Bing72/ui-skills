@@ -207,14 +207,6 @@ const commandItems = [
                   >
                     Sign in
                   </a>
-                  <a
-                    href="/library"
-                    hidden
-                    data-library-link
-                    class="type-body-md text-content-secondary hover:text-content-primary focus-visible:outline-content-primary inline-flex items-center rounded-full focus-visible:outline-1 focus-visible:outline-offset-2"
-                  >
-                    Library
-                  </a>
                   <AccountMenu client:load />
                   <button
                     type="button"
@@ -278,17 +270,11 @@ const commandItems = [
     <script>
       import { authClient } from "../lib/auth-client";
 
-      const libraryLink = document.querySelector<HTMLAnchorElement>(
-        "[data-library-link]",
-      );
       const signInLink = document.querySelector<HTMLAnchorElement>(
         "[data-sign-in-link]",
       );
       const { data } = await authClient.getSession();
       if (signInLink) signInLink.hidden = Boolean(data?.user);
-      if (libraryLink && data?.user && !data.user.image) {
-        libraryLink.hidden = false;
-      }
     </script>
   </body>
 </html>

@@ -1,7 +1,7 @@
 import { Menu } from "@base-ui/react/menu";
 import { CheckIcon, PlusIcon, StarIcon } from "@heroicons/react/24/outline";
 import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { authClient } from "../lib/auth-client";
 import {
   addSkillToCollection,
@@ -34,17 +34,21 @@ export function SkillFavorite({ skillPath }: SkillFavoriteProps) {
   const [title, setTitle] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const requestId = useRef(0);
   const saved = library?.savedSkillPaths.includes(skillPath) ?? false;
 
   useEffect(() => {
     let active = true;
+    const id = ++requestId.current;
     authClient.getSession().then(async ({ data }) => {
       if (!active || !data?.user) return;
       try {
         const result = await fetchLibrary();
-        if (active) setLibrary(result.library);
+        if (active && id === requestId.current) setLibrary(result.library);
       } catch {
-        if (active) setError("Your library could not be loaded.");
+        if (active && id === requestId.current) {
+          setError("Your library could not be loaded.");
+        }
       }
     });
     return () => {
@@ -53,18 +57,21 @@ export function SkillFavorite({ skillPath }: SkillFavoriteProps) {
   }, []);
 
   const run = async (action: () => Promise<LibrarySnapshot>) => {
+    const id = ++requestId.current;
     setPending(true);
     setError(null);
     try {
-      setLibrary(await action());
+      const snapshot = await action();
+      if (id === requestId.current) setLibrary(snapshot);
     } catch (caught) {
+      if (id !== requestId.current) return;
       setError(
         caught instanceof Error
           ? caught.message
           : "That action could not be completed. Please try again.",
       );
     } finally {
-      setPending(false);
+      if (id === requestId.current) setPending(false);
     }
   };
 

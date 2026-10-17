@@ -11,7 +11,8 @@ const itemClass =
 
 type AccountUser = {
   email: string;
-  image: string;
+  image: string | null;
+  initial: string;
 };
 
 export function AccountMenu() {
@@ -24,10 +25,12 @@ export function AccountMenu() {
     authClient.getSession().then(({ data }) => {
       if (!active) return;
       const sessionUser = data?.user;
-      if (!sessionUser?.image) return;
+      if (!sessionUser) return;
+      const label = sessionUser.name || sessionUser.email;
       setUser({
         email: sessionUser.email,
-        image: sessionUser.image,
+        image: sessionUser.image ?? null,
+        initial: label.trim().charAt(0).toUpperCase() || "?",
       });
     });
     return () => {
@@ -58,13 +61,19 @@ export function AccountMenu() {
         className="focus-visible:outline-content-primary inline-flex size-8 cursor-pointer items-center justify-center rounded-full outline-none focus-visible:outline-1 focus-visible:outline-offset-2"
         aria-label="Account"
       >
-        <img
-          src={user.image}
-          alt=""
-          width="32"
-          height="32"
-          className="border-line-default size-8 rounded-full border object-cover"
-        />
+        {user.image ? (
+          <img
+            src={user.image}
+            alt=""
+            width="32"
+            height="32"
+            className="border-line-default size-8 rounded-full border object-cover"
+          />
+        ) : (
+          <span className="border-line-default bg-surface-subtle text-content-secondary type-body-sm inline-flex size-8 items-center justify-center rounded-full border font-[450]">
+            {user.initial}
+          </span>
+        )}
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Positioner
@@ -75,13 +84,19 @@ export function AccountMenu() {
         >
           <Popover.Popup className="border-line-default bg-surface-default w-64 rounded-xl border py-1 shadow-sm outline-none">
             <div className="flex min-w-0 items-center gap-2 px-3 pt-1.5 pb-1">
-              <img
-                src={user.image}
-                alt=""
-                width="20"
-                height="20"
-                className="border-line-default size-5 shrink-0 rounded-full border object-cover"
-              />
+              {user.image ? (
+                <img
+                  src={user.image}
+                  alt=""
+                  width="20"
+                  height="20"
+                  className="border-line-default size-5 shrink-0 rounded-full border object-cover"
+                />
+              ) : (
+                <span className="border-line-default bg-surface-subtle text-content-secondary inline-flex size-5 shrink-0 items-center justify-center rounded-full border text-xs font-[450]">
+                  {user.initial}
+                </span>
+              )}
               <p className="type-body-sm text-content-secondary min-w-0 truncate">
                 {user.email}
               </p>
