@@ -1,13 +1,10 @@
-import { Popover } from "@base-ui/react/popover";
 import {
   ArrowRightStartOnRectangleIcon,
   FolderIcon,
 } from "@heroicons/react/24/outline";
+import { Menu } from "./menu";
 import { useEffect, useState } from "react";
 import { authClient } from "../lib/auth-client";
-
-const itemClass =
-  "type-body-md text-content-primary hover:bg-fill-strong mx-1 flex h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2 text-left outline-none";
 
 type AccountUser = {
   email: string;
@@ -56,8 +53,8 @@ export function AccountMenu() {
   if (!user) return null;
 
   return (
-    <Popover.Root>
-      <Popover.Trigger
+    <Menu.Root>
+      <Menu.Trigger
         className="focus-visible:outline-content-primary inline-flex size-8 cursor-pointer items-center justify-center rounded-full outline-none focus-visible:outline-1 focus-visible:outline-offset-2"
         aria-label="Account"
       >
@@ -74,16 +71,9 @@ export function AccountMenu() {
             {user.initial}
           </span>
         )}
-      </Popover.Trigger>
-      <Popover.Portal>
-        <Popover.Positioner
-          className="z-50"
-          side="bottom"
-          align="end"
-          sideOffset={8}
-        >
-          <Popover.Popup className="border-line-default bg-surface-default w-64 rounded-xl border py-1 shadow-sm outline-none">
-            <div className="flex min-w-0 items-center gap-2 px-3 pt-1.5 pb-1">
+      </Menu.Trigger>
+      <Menu.Popup className="w-64 rounded-xl px-1 py-1">
+            <div className="flex min-w-0 items-center gap-2 px-2 pt-1.5 pb-1">
               {user.image ? (
                 <img
                   src={user.image}
@@ -101,34 +91,27 @@ export function AccountMenu() {
                 {user.email}
               </p>
             </div>
-            <a href="/library" className={itemClass}>
+            <Menu.LinkItem href="/library">
               <FolderIcon className="size-4 shrink-0" aria-hidden="true" />
               Library
-            </a>
-            <div className="border-line-default mx-3 my-1 border-t" />
-            <button
-              type="button"
-              className="type-body-md text-content-primary hover:bg-fill-strong flex h-9 w-full cursor-pointer items-center gap-2.5 px-3 text-left outline-none disabled:opacity-60"
-              disabled={pending}
-              onClick={signOut}
-            >
+            </Menu.LinkItem>
+            <Menu.Separator />
+            <Menu.Item disabled={pending} onClick={signOut}>
               <ArrowRightStartOnRectangleIcon
                 className="size-4 shrink-0"
                 aria-hidden="true"
               />
               Sign out
-            </button>
+            </Menu.Item>
             {error ? (
               <p
                 role="alert"
-                className="type-body-sm text-content-secondary px-3 py-1 text-pretty"
+                className="type-body-sm text-content-secondary px-2 py-1 text-pretty"
               >
                 {error}
               </p>
             ) : null}
-          </Popover.Popup>
-        </Popover.Positioner>
-      </Popover.Portal>
-    </Popover.Root>
+      </Menu.Popup>
+    </Menu.Root>
   );
 }

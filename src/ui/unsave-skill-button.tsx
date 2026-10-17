@@ -56,7 +56,7 @@ export function UnsaveSkillButton({
           align="end"
           sideOffset={4}
         >
-          <Popover.Popup className="border-line-default bg-surface-default w-60 rounded-xl border p-3 shadow-sm outline-none">
+          <Popover.Popup className="bg-surface-default shadow-border w-60 rounded-xl p-3">
             <p className="type-body-md text-content-primary text-pretty">
               Are you sure you want to remove it?
             </p>

@@ -1,4 +1,4 @@
-import { Menu } from "@base-ui/react/menu";
+import { Menu } from "./menu";
 import { CheckIcon, PlusIcon, StarIcon } from "@heroicons/react/24/outline";
 import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
 import { useEffect, useId, useRef, useState } from "react";
@@ -11,7 +11,29 @@ import {
   saveSkill,
   unsaveSkill,
 } from "../lib/library-client";
-import { LIBRARY_LIMITS, type LibrarySnapshot } from "../lib/library-types";
+import {
+  LIBRARY_LIMITS,
+  type LibrarySnapshot,
+} from "../lib/library-types";
+
+function keepCollectionOrder(
+  previous: LibrarySnapshot | null,
+  next: LibrarySnapshot,
+) {
+  if (!previous) return next;
+  const byId = new Map(
+    next.collections.map((collection) => [collection.id, collection]),
+  );
+  const collections = previous.collections.flatMap((collection) => {
+    const current = byId.get(collection.id);
+    return current ? [current] : [];
+  });
+  const seen = new Set(collections.map((collection) => collection.id));
+  for (const collection of next.collections) {
+    if (!seen.has(collection.id)) collections.push(collection);
+  }
+  return { ...next, collections };
+}
 
 const itemClass =
   "type-body-md text-content-primary data-highlighted:bg-fill-strong relative flex h-8 w-full cursor-pointer items-center rounded-md pr-2 pl-8 text-left outline-none data-disabled:opacity-60";
@@ -56,13 +78,19 @@ export function SkillFavorite({ skillPath }: SkillFavoriteProps) {
     };
   }, []);
 
-  const run = async (action: () => Promise<LibrarySnapshot>) => {
+  const run = async (
+    action: () => Promise<LibrarySnapshot>,
+    keepOrder = false,
+  ) => {
     const id = ++requestId.current;
-    setPending(true);
+    if (!keepOrder) setPending(true);
     setError(null);
     try {
       const snapshot = await action();
-      if (id === requestId.current) setLibrary(snapshot);
+      if (id !== requestId.current) return;
+      setLibrary((current) =>
+        keepOrder ? keepCollectionOrder(current, snapshot) : snapshot,
+      );
     } catch (caught) {
       if (id !== requestId.current) return;
       setError(
@@ -70,9 +98,49 @@ export function SkillFavorite({ skillPath }: SkillFavoriteProps) {
           ? caught.message
           : "That action could not be completed. Please try again.",
       );
+      throw caught;
     } finally {
-      if (id === requestId.current) setPending(false);
+      if (id === requestId.current && !keepOrder) setPending(false);
     }
+  };
+
+  const toggleRow = (
+    rowId: string,
+    checked: boolean,
+    action: () => Promise<LibrarySnapshot>,
+  ) => {
+    const previous = library;
+    const issuedAt = requestId.current;
+    setLibrary((current) => {
+      if (!current) return current;
+      if (rowId === "favorites") {
+        const savedPaths = current.savedSkillPaths.filter(
+          (path) => path !== skillPath,
+        );
+        return {
+          ...current,
+          savedSkillPaths: checked ? [...savedPaths, skillPath] : savedPaths,
+        };
+      }
+      return {
+        ...current,
+        collections: current.collections.map((collection) =>
+          collection.id === rowId
+            ? {
+                ...collection,
+                skillPaths: checked
+                  ? collection.skillPaths.includes(skillPath)
+                    ? collection.skillPaths
+                    : [...collection.skillPaths, skillPath]
+                  : collection.skillPaths.filter((path) => path !== skillPath),
+              }
+            : collection,
+        ),
+      };
+    });
+    void run(action, true).catch(() => {
+      if (previous && requestId.current === issuedAt + 1) setLibrary(previous);
+    });
   };
 
   const rows = [
@@ -124,20 +192,19 @@ export function SkillFavorite({ skillPath }: SkillFavoriteProps) {
           <StarIcon className="size-4" aria-hidden="true" />
         )}
       </Menu.Trigger>
-      <Menu.Portal>
-        <Menu.Positioner className="z-30" side="bottom" align="end" sideOffset={8}>
-          <Menu.Popup className="border-line-default bg-surface-default w-60 rounded-lg border p-1 shadow-2xs outline-none">
+      <Menu.Popup className="w-60 rounded-lg p-1">
             <div className="max-h-56 overflow-y-auto">
               {rows.map((row) => (
                 <Menu.CheckboxItem
                   key={row.id}
                   className={itemClass}
                   checked={row.checked}
-                  disabled={pending}
                   closeOnClick={false}
                   label={row.label}
                   onCheckedChange={(checked) => {
-                    void run(async () => (await row.toggle(checked)).library);
+                    toggleRow(row.id, checked, async () =>
+                      (await row.toggle(checked)).library,
+                    );
                   }}
                 >
                   <Menu.CheckboxItemIndicator className="absolute left-2 inline-flex items-center">
@@ -199,9 +266,7 @@ export function SkillFavorite({ skillPath }: SkillFavoriteProps) {
                 </p>
               ) : null}
             </form>
-          </Menu.Popup>
-        </Menu.Positioner>
-      </Menu.Portal>
+      </Menu.Popup>
     </Menu.Root>
   );
 }

@@ -1,6 +1,6 @@
 import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Dialog } from "@base-ui/react/dialog";
-import { Popover } from "@base-ui/react/popover";
+import { Menu } from "./menu";
 import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 import { useId, useState } from "react";
 import { deleteCollection, updateCollection } from "../lib/library-client";
@@ -10,9 +10,6 @@ type CollectionMenuProps = {
   collectionId: string;
   title: string;
 };
-
-const itemClass =
-  "type-body-md text-content-primary hover:bg-fill-strong flex h-8 w-full cursor-pointer items-center rounded-md px-2 text-left outline-none";
 
 const controlClass =
   "type-body-md inline-flex h-8 cursor-pointer items-center justify-center rounded-lg border px-3 focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-content-primary disabled:opacity-60";
@@ -54,48 +51,33 @@ export function CollectionMenu({ collectionId, title }: CollectionMenuProps) {
 
   return (
     <>
-      <Popover.Root open={menuOpen} onOpenChange={setMenuOpen}>
-        <Popover.Trigger
+      <Menu.Root open={menuOpen} onOpenChange={setMenuOpen}>
+        <Menu.Trigger
           className="text-content-muted hover:bg-fill-strong hover:text-content-primary data-popup-open:bg-fill-strong data-popup-open:text-content-primary inline-flex size-6 cursor-pointer items-center justify-center rounded-md outline-none"
           aria-label={`Actions for ${title}`}
         >
           <EllipsisHorizontalIcon className="size-4" aria-hidden="true" />
-        </Popover.Trigger>
-        <Popover.Portal>
-          <Popover.Positioner
-            className="z-50"
-            side="bottom"
-            align="end"
-            sideOffset={4}
+        </Menu.Trigger>
+        <Menu.Popup className="w-36 rounded-lg p-1" sideOffset={4}>
+          <Menu.Item
+            onClick={() => {
+              setName(title);
+              setError(null);
+              setRenameOpen(true);
+            }}
           >
-            <Popover.Popup className="border-line-default bg-surface-default w-36 rounded-lg border p-1 shadow-2xs outline-none">
-              <button
-                type="button"
-                className={itemClass}
-                onClick={() => {
-                  setMenuOpen(false);
-                  setName(title);
-                  setError(null);
-                  setRenameOpen(true);
-                }}
-              >
-                Rename
-              </button>
-              <button
-                type="button"
-                className={itemClass}
-                onClick={() => {
-                  setMenuOpen(false);
-                  setError(null);
-                  setDeleteOpen(true);
-                }}
-              >
-                Delete
-              </button>
-            </Popover.Popup>
-          </Popover.Positioner>
-        </Popover.Portal>
-      </Popover.Root>
+            Rename
+          </Menu.Item>
+          <Menu.Item
+            onClick={() => {
+              setError(null);
+              setDeleteOpen(true);
+            }}
+          >
+            Delete
+          </Menu.Item>
+        </Menu.Popup>
+      </Menu.Root>
 
       <Dialog.Root
         open={renameOpen}
