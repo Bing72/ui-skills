@@ -2,7 +2,6 @@ import { parseSkillPath } from "./library-skill";
 import type { LibraryStore } from "./library-store";
 import {
   LibraryError,
-  parseCollectionDescription,
   parseCollectionTitle,
   type LibrarySnapshot,
 } from "./library-types";
@@ -107,7 +106,6 @@ export async function handleLibraryRequest(
       const body = await readBody(request);
       const created = await store.createCollection(userId, {
         title: parseCollectionTitle(body.title),
-        description: parseCollectionDescription(body.description),
         skillPath:
           body.skillPath == null ? undefined : parseSkillPath(body.skillPath),
       });
@@ -120,14 +118,8 @@ export async function handleLibraryRequest(
       method === "PATCH"
     ) {
       const body = await readBody(request);
-      const input: { title?: string; description?: string } = {};
-      if ("title" in body) input.title = parseCollectionTitle(body.title);
-      if ("description" in body) {
-        input.description = parseCollectionDescription(body.description);
-      }
-      if (!("title" in body) && !("description" in body)) {
-        throw new LibraryError("Nothing to update.");
-      }
+      if (!("title" in body)) throw new LibraryError("Nothing to update.");
+      const input = { title: parseCollectionTitle(body.title) };
       return libraryResponse(
         await store.updateCollection(userId, collectionId(segments[1]), input),
       );

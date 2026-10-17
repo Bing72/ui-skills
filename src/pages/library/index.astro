@@ -42,15 +42,6 @@ const savedSkills = library.savedSkillPaths.map(toLibrarySkill);
         <CreateCollectionButton client:idle />
       </div>
 
-      <p
-        id="library-error"
-        class="type-body-md text-content-secondary text-pretty"
-        role="alert"
-        data-library-error
-        hidden
-      >
-      </p>
-
       {
         library.collections.length > 0 ? (
           <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -94,9 +85,3 @@ const savedSkills = library.savedSkillPaths.map(toLibrarySkill);
     </div>
   </div>
 </Layout>
-
-<script>
-  import { bindLibraryPage } from "../../lib/library-client";
-
-  bindLibraryPage(document);
-</script>

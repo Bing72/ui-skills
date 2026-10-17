@@ -9,9 +9,7 @@ import {
   collectionSlug,
   isCollectionSlug,
   isLibraryPath,
-  parseCollectionDescription,
   parseCollectionTitle,
-  skillCountLabel,
   suffixedCollectionSlug,
   type LibrarySnapshot,
 } from "../src/lib/library-types.ts";
@@ -42,7 +40,6 @@ function store(overrides: Partial<LibraryStore> = {}): LibraryStore {
           id: "11111111-1111-4111-8111-111111111111",
           slug: "mobile-review",
           title: "Mobile review",
-          description: "",
           skillPaths: [],
         },
       };
@@ -101,8 +98,6 @@ describe("personal library", () => {
     assert.equal(isCollectionSlug("mobile-app-design"), true);
     assert.equal(isCollectionSlug("../account"), false);
     assert.equal(suffixedCollectionSlug("mobile-review", 2), "mobile-review-2");
-    assert.equal(skillCountLabel(1), "1 skill");
-    assert.equal(skillCountLabel(2), "2 skills");
   });
 
   test("rejects empty, symbolic, and oversized collection copy", () => {
@@ -111,11 +106,6 @@ describe("personal library", () => {
     assert.throws(() => parseCollectionTitle("***"), LibraryError);
     assert.throws(
       () => parseCollectionTitle("a".repeat(81)),
-      LibraryError,
-    );
-    assert.equal(parseCollectionDescription(undefined), "");
-    assert.throws(
-      () => parseCollectionDescription("a".repeat(241)),
       LibraryError,
     );
   });
@@ -195,14 +185,12 @@ describe("personal library", () => {
     const response = await handleLibraryRequest(
       request("/api/library/collections", "POST", {
         title: "  Mobile review  ",
-        description: "Screens to revisit",
         skillPath: "ibelick/ui-skills-root",
       }),
       "user-1",
       store({
         async createCollection(_userId, input) {
           assert.equal(input.title, "Mobile review");
-          assert.equal(input.description, "Screens to revisit");
           assert.equal(input.skillPath, "ibelick/ui-skills-root");
           return {
             library: emptyLibrary,
@@ -210,7 +198,6 @@ describe("personal library", () => {
               id: "11111111-1111-4111-8111-111111111111",
               slug: "mobile-review",
               title: input.title,
-              description: input.description,
               skillPaths: [input.skillPath ?? ""],
             },
           };

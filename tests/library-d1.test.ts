@@ -54,12 +54,10 @@ test("saved skills and collections stay private to each account", async () => {
     await library.saveSkill("user-1", "ibelick/ui-skills-root");
     const created = await library.createCollection("user-1", {
       title: "Mobile review",
-      description: "Screens to revisit",
       skillPath: "ibelick/ui-skills-root",
     });
     const again = await library.createCollection("user-1", {
       title: "Mobile review",
-      description: "",
     });
 
     assert.equal(created.collection.slug, "mobile-review");

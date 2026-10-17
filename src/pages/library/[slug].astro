@@ -57,16 +57,9 @@ const skills = (collection?.skillPaths ?? []).map(toLibrarySkill);
         collection ? (
           <>
             <div class="flex items-center justify-between gap-4">
-              <div class="flex min-w-0 flex-col gap-2">
-                <h1 class="type-h1 text-content-primary text-balance">
-                  {collection.title}
-                </h1>
-                {collection.description ? (
-                  <p class="type-body-md text-content-secondary text-pretty">
-                    {collection.description}
-                  </p>
-                ) : null}
-              </div>
+              <h1 class="type-h1 text-content-primary min-w-0 text-balance">
+                {collection.title}
+              </h1>
               <div class="flex shrink-0 items-center gap-1">
                 <EditCollectionButton
                   client:load
@@ -80,14 +73,6 @@ const skills = (collection?.skillPaths ?? []).map(toLibrarySkill);
                 />
               </div>
             </div>
-
-            <p
-              id="library-error"
-              class="type-body-md text-content-secondary text-pretty"
-              role="alert"
-              data-library-error
-              hidden
-            />
 
             <div class="-mt-6">
               {skills.length > 0 ? (
@@ -141,9 +126,3 @@ const skills = (collection?.skillPaths ?? []).map(toLibrarySkill);
     </div>
   </div>
 </Layout>
-
-<script>
-  import { bindLibraryPage } from "../../lib/library-client";
-
-  bindLibraryPage(document);
-</script>

@@ -3,14 +3,12 @@ export const LIBRARY_LIMITS = {
   collections: 30,
   skillsPerCollection: 40,
   title: 80,
-  description: 240,
 } as const;
 
 export type LibraryCollection = {
   id: string;
   slug: string;
   title: string;
-  description: string;
   skillPaths: string[];
 };
 
@@ -75,20 +73,4 @@ export function parseCollectionTitle(value: unknown) {
     throw new LibraryError("Use a title with letters or numbers.");
   }
   return title;
-}
-
-export function parseCollectionDescription(value: unknown) {
-  if (value == null) return "";
-  if (typeof value !== "string") {
-    throw new LibraryError("Enter a shorter description.");
-  }
-  const description = value.trim().replace(/\s+/g, " ");
-  if (description.length > LIBRARY_LIMITS.description) {
-    throw new LibraryError("Use a description of 240 characters or fewer.");
-  }
-  return description;
-}
-
-export function skillCountLabel(count: number) {
-  return count === 1 ? "1 skill" : `${count} skills`;
 }

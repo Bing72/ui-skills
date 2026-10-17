@@ -23,12 +23,12 @@ export type LibraryStore = {
   unsaveSkill(userId: string, skillPath: string): Promise<LibrarySnapshot>;
   createCollection(
     userId: string,
-    input: { title: string; description: string; skillPath?: string },
+    input: { title: string; skillPath?: string },
   ): Promise<{ library: LibrarySnapshot; collection: LibraryCollection }>;
   updateCollection(
     userId: string,
     id: string,
-    input: { title?: string; description?: string },
+    input: { title: string },
   ): Promise<LibrarySnapshot>;
   deleteCollection(userId: string, id: string): Promise<LibrarySnapshot>;
   addSkill(
@@ -48,7 +48,6 @@ function toCollection(
     id: string;
     slug: string;
     title: string;
-    description: string;
   },
   skillPaths: string[],
 ): LibraryCollection {
@@ -56,7 +55,6 @@ function toCollection(
     id: row.id,
     slug: row.slug,
     title: row.title,
-    description: row.description,
     skillPaths,
   };
 }
@@ -218,7 +216,7 @@ export function createLibraryStore(database: D1Database): LibraryStore {
           userId,
           slug,
           title: input.title,
-          description: input.description,
+          description: "",
           createdAt: now,
           updatedAt: now,
         });
@@ -249,10 +247,7 @@ export function createLibraryStore(database: D1Database): LibraryStore {
       await db
         .update(userCollection)
         .set({
-          ...(input.title ? { title: input.title } : {}),
-          ...(input.description !== undefined
-            ? { description: input.description }
-            : {}),
+          title: input.title,
           updatedAt: new Date(),
         })
         .where(
