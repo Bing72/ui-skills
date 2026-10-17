@@ -2,15 +2,17 @@ import { Menu } from "./menu";
 import { CheckIcon, PlusIcon, StarIcon } from "@heroicons/react/24/outline";
 import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
 import { useEffect, useId, useRef, useState } from "react";
-import { authClient } from "../lib/auth-client";
 import {
   addSkillToCollection,
   createCollection,
   fetchLibrary,
+  readLibraryCache,
   removeSkillFromCollection,
   saveSkill,
   unsaveSkill,
+  writeLibraryCache,
 } from "../lib/library-client";
+import { getCachedSession } from "../lib/session-client";
 import {
   LIBRARY_LIMITS,
   type LibrarySnapshot,
@@ -62,11 +64,19 @@ export function SkillFavorite({ skillPath }: SkillFavoriteProps) {
   useEffect(() => {
     let active = true;
     const id = ++requestId.current;
-    authClient.getSession().then(async ({ data }) => {
+    getCachedSession().then(async ({ data }) => {
       if (!active || !data?.user) return;
+      const cached = readLibraryCache();
+      if (cached) {
+        if (id === requestId.current) setLibrary(cached);
+        return;
+      }
       try {
         const result = await fetchLibrary();
-        if (active && id === requestId.current) setLibrary(result.library);
+        if (active && id === requestId.current) {
+          writeLibraryCache(result.library);
+          setLibrary(result.library);
+        }
       } catch {
         if (active && id === requestId.current) {
           setError("Your library could not be loaded.");
@@ -88,9 +98,11 @@ export function SkillFavorite({ skillPath }: SkillFavoriteProps) {
     try {
       const snapshot = await action();
       if (id !== requestId.current) return;
-      setLibrary((current) =>
-        keepOrder ? keepCollectionOrder(current, snapshot) : snapshot,
-      );
+      setLibrary((current) => {
+        const next = keepOrder ? keepCollectionOrder(current, snapshot) : snapshot;
+        writeLibraryCache(next);
+        return next;
+      });
     } catch (caught) {
       if (id !== requestId.current) return;
       setError(
@@ -113,33 +125,44 @@ export function SkillFavorite({ skillPath }: SkillFavoriteProps) {
     const issuedAt = requestId.current;
     setLibrary((current) => {
       if (!current) return current;
-      if (rowId === "favorites") {
-        const savedPaths = current.savedSkillPaths.filter(
-          (path) => path !== skillPath,
-        );
-        return {
-          ...current,
-          savedSkillPaths: checked ? [...savedPaths, skillPath] : savedPaths,
-        };
-      }
-      return {
-        ...current,
-        collections: current.collections.map((collection) =>
-          collection.id === rowId
-            ? {
-                ...collection,
-                skillPaths: checked
-                  ? collection.skillPaths.includes(skillPath)
-                    ? collection.skillPaths
-                    : [...collection.skillPaths, skillPath]
-                  : collection.skillPaths.filter((path) => path !== skillPath),
-              }
-            : collection,
-        ),
-      };
+      const next =
+        rowId === "favorites"
+          ? {
+              ...current,
+              savedSkillPaths: checked
+                ? [
+                    ...current.savedSkillPaths.filter(
+                      (path) => path !== skillPath,
+                    ),
+                    skillPath,
+                  ]
+                : current.savedSkillPaths.filter((path) => path !== skillPath),
+            }
+          : {
+              ...current,
+              collections: current.collections.map((collection) =>
+                collection.id === rowId
+                  ? {
+                      ...collection,
+                      skillPaths: checked
+                        ? collection.skillPaths.includes(skillPath)
+                          ? collection.skillPaths
+                          : [...collection.skillPaths, skillPath]
+                        : collection.skillPaths.filter(
+                            (path) => path !== skillPath,
+                          ),
+                    }
+                  : collection,
+              ),
+            };
+      writeLibraryCache(next);
+      return next;
     });
     void run(action, true).catch(() => {
-      if (previous && requestId.current === issuedAt + 1) setLibrary(previous);
+      if (previous && requestId.current === issuedAt + 1) {
+        writeLibraryCache(previous);
+        setLibrary(previous);
+      }
     });
   };
 
@@ -170,7 +193,7 @@ export function SkillFavorite({ skillPath }: SkillFavoriteProps) {
           setOpen(false);
           return;
         }
-        void authClient.getSession().then(({ data }) => {
+        void getCachedSession().then(({ data }) => {
           if (!data?.user) {
             const returnTo = `${location.pathname}${location.search}`;
             location.assign(`/login?returnTo=${encodeURIComponent(returnTo)}`);

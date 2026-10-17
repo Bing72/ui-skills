@@ -207,7 +207,7 @@ const commandItems = [
                   >
                     Sign in
                   </a>
-                  <AccountMenu client:load />
+                  <AccountMenu client:idle />
                   <button
                     type="button"
                     aria-label="Search skills and playbook"
@@ -268,12 +268,12 @@ const commandItems = [
     </div>
     {!fullScreen && <PromoBanner client:load />}
     <script>
-      import { authClient } from "../lib/auth-client";
+      import { getCachedSession } from "../lib/session-client";
 
       const signInLink = document.querySelector<HTMLAnchorElement>(
         "[data-sign-in-link]",
       );
-      const { data } = await authClient.getSession();
+      const { data } = await getCachedSession();
       if (signInLink) signInLink.hidden = Boolean(data?.user);
     </script>
   </body>

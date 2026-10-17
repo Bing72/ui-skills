@@ -1,5 +1,48 @@
 import type { LibraryCollection, LibrarySnapshot } from "./library-types";
 
+const libraryCacheKey = "ui-skills.library";
+const libraryCacheMs = 10 * 60 * 1000;
+
+export function readLibraryCache() {
+  try {
+    const raw = sessionStorage.getItem(libraryCacheKey);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { at?: unknown; library?: LibrarySnapshot };
+    const library = parsed.library;
+    if (
+      !library ||
+      !Array.isArray(library.savedSkillPaths) ||
+      !Array.isArray(library.collections) ||
+      typeof parsed.at !== "number" ||
+      Date.now() - parsed.at > libraryCacheMs
+    ) {
+      return null;
+    }
+    return library;
+  } catch {
+    return null;
+  }
+}
+
+export function writeLibraryCache(library: LibrarySnapshot) {
+  try {
+    sessionStorage.setItem(
+      libraryCacheKey,
+      JSON.stringify({ at: Date.now(), library }),
+    );
+  } catch {
+    // Private browsing can reject storage. The page still works from the network.
+  }
+}
+
+export function clearLibraryCache() {
+  try {
+    sessionStorage.removeItem(libraryCacheKey);
+  } catch {
+    // Ignore storage failures. Sign-out still leaves the page.
+  }
+}
+
 type LibraryPayload = {
   library: LibrarySnapshot;
   collection?: LibraryCollection;

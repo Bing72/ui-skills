@@ -5,6 +5,8 @@ import {
 import { Menu } from "./menu";
 import { useEffect, useState } from "react";
 import { authClient } from "../lib/auth-client";
+import { clearLibraryCache } from "../lib/library-client";
+import { getCachedSession } from "../lib/session-client";
 
 type AccountUser = {
   email: string;
@@ -19,7 +21,7 @@ export function AccountMenu() {
 
   useEffect(() => {
     let active = true;
-    authClient.getSession().then(({ data }) => {
+    getCachedSession().then(({ data }) => {
       if (!active) return;
       const sessionUser = data?.user;
       if (!sessionUser) return;
@@ -42,6 +44,7 @@ export function AccountMenu() {
       .signOut()
       .then((result) => {
         if (result.error) throw new Error("Sign-out failed");
+        clearLibraryCache();
         window.location.assign("/");
       })
       .catch(() => {

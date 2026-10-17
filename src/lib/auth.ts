@@ -67,7 +67,13 @@ export function getAuth(env: AuthEnv) {
     session: {
       expiresIn: 60 * 60 * 24 * 7,
       updateAge: 60 * 60 * 24,
-      cookieCache: { enabled: false },
+      // A signed cookie serves the session for five minutes, so catalog pages
+      // do not read D1 on every view. Sign-out clears the cookie immediately.
+      cookieCache: {
+        enabled: true,
+        maxAge: 5 * 60,
+        strategy: "compact",
+      },
     },
     advanced: {
       useSecureCookies: config.secureCookies,

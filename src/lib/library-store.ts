@@ -85,16 +85,22 @@ async function readSnapshot(
   db: LibraryDatabase,
   userId: string,
 ): Promise<LibrarySnapshot> {
-  const saved = await db
-    .select({ skillPath: savedSkill.skillPath })
-    .from(savedSkill)
-    .where(eq(savedSkill.userId, userId))
-    .orderBy(desc(savedSkill.createdAt));
-  const collections = await db
-    .select()
-    .from(userCollection)
-    .where(eq(userCollection.userId, userId))
-    .orderBy(desc(userCollection.updatedAt));
+  const [saved, collections] = await Promise.all([
+    db
+      .select({ skillPath: savedSkill.skillPath })
+      .from(savedSkill)
+      .where(eq(savedSkill.userId, userId))
+      .orderBy(desc(savedSkill.createdAt)),
+    db
+      .select({
+        id: userCollection.id,
+        slug: userCollection.slug,
+        title: userCollection.title,
+      })
+      .from(userCollection)
+      .where(eq(userCollection.userId, userId))
+      .orderBy(desc(userCollection.updatedAt)),
+  ]);
   const skills = await skillPathsFor(
     db,
     collections.map((collection) => collection.id),

@@ -165,7 +165,8 @@ describe("website authentication", () => {
     );
     assert.equal(auth.options.account?.encryptOAuthTokens, true);
     assert.equal(auth.options.rateLimit?.storage, "database");
-    assert.equal(auth.options.session?.cookieCache?.enabled, false);
+    assert.equal(auth.options.session?.cookieCache?.enabled, true);
+    assert.equal(auth.options.session?.cookieCache?.maxAge, 300);
   });
 
   test("HTTPS session cookies are secure, HTTP-only, host-only, and SameSite=Lax", async () => {

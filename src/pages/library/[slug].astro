@@ -126,3 +126,9 @@ const skills = (collection?.skillPaths ?? []).map(toLibrarySkill);
     </div>
   </div>
 </Layout>
+
+<script>
+  import { clearLibraryCache } from "../../lib/library-client";
+
+  clearLibraryCache();
+</script>
