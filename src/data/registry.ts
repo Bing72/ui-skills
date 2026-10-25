@@ -5980,6 +5980,60 @@ const registrySource: RegistrySourceSkill[] = [
     description:
       "A wireframe portal bursts open, the title comes through, then its letters swap into a second phrase. HyperFrames block, 1920×1080, 8s, 9 variables.",
   },
+  {
+    slug: "dimensional-drawing",
+    user: "enesozturk",
+    repo: "dimensional-drawing",
+    rawUrl:
+      "https://raw.githubusercontent.com/enesozturk/dimensional-drawing/main/skills/dimensional-drawing/SKILL.md",
+    githubUrl:
+      "https://github.com/enesozturk/dimensional-drawing/blob/main/skills/dimensional-drawing/SKILL.md",
+    name: "dimensional-drawing",
+    topics: ["visual", "craft", "frontend"],
+    description:
+      "Make an Apple-style monochrome dimensional drawing of a UI component or physical product — title-block summary plus one dense drawing sheet with variable-based dimensions. Use when asked for an anatomy, spec sheet, redline or dimensional drawing of a component.",
+  },
+  {
+    slug: "dimensional-drawing-motion",
+    user: "enesozturk",
+    repo: "dimensional-drawing",
+    rawUrl:
+      "https://raw.githubusercontent.com/enesozturk/dimensional-drawing/main/skills/dimensional-drawing-motion/SKILL.md",
+    githubUrl:
+      "https://github.com/enesozturk/dimensional-drawing/blob/main/skills/dimensional-drawing-motion/SKILL.md",
+    files: ["adapters/claude-motion.md"],
+    name: "dimensional-drawing-motion",
+    topics: ["motion", "visual", "craft", "video"],
+    description:
+      "Turn a finished dimensional drawing sheet into a ~10 s Apple-style motion film — lines draw themselves in, the camera pulls back, layers lift into an exploded view, the full sheet resolves. Use after the dimensional-drawing skill, or when asked to animate a spec sheet or anatomy drawing.",
+  },
+  {
+    slug: "rossark-motion-skill",
+    user: "rossark0",
+    repo: "rossark-motion-skill",
+    rawUrl:
+      "https://raw.githubusercontent.com/rossark0/rossark-motion-skill/main/SKILL.md",
+    githubUrl:
+      "https://github.com/rossark0/rossark-motion-skill/blob/main/SKILL.md",
+    files: ["MOTION.md"],
+    name: "rossark-motion-skill",
+    topics: ["motion", "craft", "visual", "frontend"],
+    description:
+      'Bring anything drawn to life with calm, believable motion. It covers characters and creatures (gliding pupils, blinks, breathing, head tilts), full-body acting (landing, waving, leaning, levitating, kicking a ball), plants, fabric, fire, smoke, water, weather, lights, machines, vehicles, icons, logos, charts and whole scenes. Use it whenever someone asks to animate an illustration, an icon, a mascot or a scene, to make something "feel alive", to add idle motion, to turn a static drawing into a living one, or to recreate the motion of a reference video. Comes with a small motion engine and templates for React Native (react-native-svg + Reanimated) and SwiftUI (TimelineView + Canvas), tools that measure a reference video frame by frame, and offline rendering to video, in a phone frame too. The method also works on the web.',
+  },
+  {
+    slug: "hallmark",
+    user: "nutlope",
+    repo: "hallmark",
+    rawUrl:
+      "https://raw.githubusercontent.com/nutlope/hallmark/main/skills/hallmark/SKILL.md",
+    githubUrl:
+      "https://github.com/nutlope/hallmark/blob/main/skills/hallmark/SKILL.md",
+    name: "hallmark",
+    topics: ["taste", "visual", "craft", "frontend"],
+    description:
+      'Design skill for websites and new pages that look designed, not generated. Use when the user asks to build or design something new, or names Hallmark. Never use it on an existing design unless the user names Hallmark, as in `/hallmark redesign <path>`.',
+  },
 ];
 
 const buildInitialPathSlug = (entry: RegistrySourceSkill) => {
