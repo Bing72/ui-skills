@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-10-25T08:17:30.377Z",
-  "skillCount": 448,
+  "generatedAt": "2026-10-25T08:41:09.888Z",
+  "skillCount": 452,
   "digests": {
     "ibelick/ui-skills-root": "sha256:d4e1033f910467164a9cd3931277c1b309cb87c6d23cb5f184a65bfdf92b1c9c",
     "ibelick/baseline-ui": "sha256:fea3322f36d58fdafafce2aef56e4556dd2ac7b20876b7dff7d8be7f25fa597f",
@@ -449,6 +449,10 @@
     "heygen-com/frost-sequence-camera-orbit": "sha256:e579e7f870a9be0a88a6a9916aa2076d3e771d53b48d5004da3111711355c6e6",
     "heygen-com/glass-shard-title": "sha256:7c4c3c98a4f9cd5a4c50af3752c972aa1e46bfaf4c271c9181539ba305b8d365",
     "heygen-com/orbit-card": "sha256:78af47b211816633837a76cd0951ecc83fbaba50ab7f5615d9795cc17ea08a24",
-    "heygen-com/wireframe-portal-title": "sha256:553d548c2316b24994e47cd2edbf61cccf2a206b5620017fc3df81cad260afa5"
+    "heygen-com/wireframe-portal-title": "sha256:553d548c2316b24994e47cd2edbf61cccf2a206b5620017fc3df81cad260afa5",
+    "enesozturk/dimensional-drawing": "sha256:b4fce1c4556d22734a13f949da9d914df0436d5f2170191f6ec78a879d0ac5ba",
+    "rossark0/rossark-motion-skill": "sha256:b8b452830050ed506fbd44c22105a71d88e3acfcf26ddfc152c7c382b55e5b88",
+    "nutlope/hallmark": "sha256:25a1ff92d925b2389e8409f42fb8ad7e033fceca8b5d1f07ed4ca4c28da53dc3",
+    "enesozturk/dimensional-drawing-motion": "sha256:51f8b4a500cce6220d8c3375ee2c691ed8153dfb02385b854a685c81fe241e6d"
   }
 }
