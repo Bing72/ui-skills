@@ -4,27 +4,17 @@ import { jsonHeaders } from "../../lib/oauth-discovery";
 
 export const GET: APIRoute = ({ request }) => {
   const url = new URL(request.url);
-  const redirectUri = url.searchParams.get("redirect_uri");
-  const state = url.searchParams.get("state");
+  const redirectUri = url.searchParams.has("redirect_uri");
 
-  if (!redirectUri) {
-    return new Response(
-      JSON.stringify({
-        error: "invalid_request",
-        error_description:
-          "Authorization code flow is optional. Prefer client_credentials for agents, or omit auth for public catalog reads.",
-      }),
-      { status: 400, headers: jsonHeaders },
-    );
-  }
-
-  const target = new URL(redirectUri);
-  target.searchParams.set("error", "unauthorized_client");
-  target.searchParams.set(
-    "error_description",
-    "Interactive authorization is not required for public UI Skills catalog APIs.",
+  // This service does not register redirect URIs or issue authorization codes.
+  // Redirecting to an unverified caller-provided URI would make this endpoint an
+  // open redirect and could lend the ui-skills.com origin to phishing links.
+  return new Response(
+    JSON.stringify({
+      error: redirectUri ? "unauthorized_client" : "invalid_request",
+      error_description:
+        "Interactive authorization is not supported. Use client_credentials for public catalog reads.",
+    }),
+    { status: 400, headers: jsonHeaders },
   );
-  if (state) target.searchParams.set("state", state);
-
-  return Response.redirect(target, 302);
 };

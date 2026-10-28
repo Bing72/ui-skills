@@ -14,6 +14,7 @@ import { GET as getPrm } from "../src/pages/.well-known/oauth-protected-resource
 import { POST as postRegister } from "../src/pages/oauth/register.ts";
 import { POST as postToken } from "../src/pages/oauth/token.ts";
 import { POST as postClaim } from "../src/pages/oauth/claim.ts";
+import { GET as getAuthorize } from "../src/pages/oauth/authorize.ts";
 
 const origin = "https://www.ui-skills.com";
 const siteCtx = { site: new URL(origin) } as never;
@@ -105,6 +106,21 @@ describe("oauth auth discovery", () => {
     assert.match(
       ((await claim.json()) as { access_token: string }).access_token,
       /^uis_/,
+    );
+  });
+
+  test("authorization endpoint never redirects to an unregistered URI", async () => {
+    const response = await getAuthorize({
+      request: new Request(
+        `${origin}/oauth/authorize?redirect_uri=https%3A%2F%2Fevil.example%2Fcallback&state=secret`,
+      ),
+    } as never);
+
+    assert.equal(response.status, 400);
+    assert.equal(response.headers.get("location"), null);
+    assert.equal(
+      ((await response.json()) as { error: string }).error,
+      "unauthorized_client",
     );
   });
 });
